@@ -8,9 +8,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Play, RotateCcw, Drum, Music, Info, Trash2 } from 'lucide-react';
 
 // Constants
-const BPM = 88;
 const MAX_BEATS = 4.0;
-const BEAT_TIME = 60 / BPM;
 
 interface NoteType {
   id: string;
@@ -33,11 +31,13 @@ export default function App() {
   const [sequence, setSequence] = useState<NoteType[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [bpm, setBpm] = useState(88);
   
   const audioCtxRef = useRef<AudioContext | null>(null);
   
   const totalBeats = sequence.reduce((sum, note) => sum + note.len, 0);
   const remainingBeats = Math.max(0, MAX_BEATS - totalBeats);
+  const beatTime = 60 / bpm;
 
   const initAudio = () => {
     if (!audioCtxRef.current) {
@@ -104,18 +104,18 @@ export default function App() {
           break;
         case '8-8':
           playTick(440, nextStartTime, 0.05);
-          playTick(440, nextStartTime + (BEAT_TIME / 2), 0.05);
+          playTick(440, nextStartTime + (beatTime / 2), 0.05);
           break;
         case '8':
           playTick(440, nextStartTime, 0.05);
           break;
         case '16-16':
           playTick(550, nextStartTime, 0.03);
-          playTick(550, nextStartTime + (BEAT_TIME / 4), 0.03);
+          playTick(550, nextStartTime + (beatTime / 4), 0.03);
           break;
       }
 
-      const duration = note.len * BEAT_TIME;
+      const duration = note.len * beatTime;
       nextStartTime += duration;
       await new Promise(resolve => setTimeout(resolve, duration * 1000));
     }
@@ -141,11 +141,23 @@ export default function App() {
         </div>
 
         <div className="flex items-center gap-8 bg-studio-bg px-6 py-2 rounded-full border border-studio-border">
-          <div className="flex flex-col items-center">
-            <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Tempo</span>
-            <span className="text-xl font-mono text-neon-emerald font-bold">{BPM}.00 <span className="text-xs text-slate-700">BPM</span></span>
+          <div className="flex flex-col items-center group relative pt-2">
+            <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest mb-1">Tempo</span>
+            <div className="flex items-center gap-4">
+              <span className="text-xl font-mono text-neon-emerald font-bold min-w-[3ch] transition-all">
+                {bpm}<span className="text-xs text-slate-700 ml-1">BPM</span>
+              </span>
+              <input 
+                type="range"
+                min="40"
+                max="240"
+                value={bpm}
+                onChange={(e) => setBpm(parseInt(e.target.value))}
+                className="w-24 h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-neon-emerald hover:accent-emerald-400 transition-all"
+              />
+            </div>
           </div>
-          <div className="w-px h-8 bg-studio-border"></div>
+          <div className="w-px h-8 bg-studio-border self-center"></div>
           <div className="flex flex-col items-center">
             <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Signature</span>
             <span className="text-xl font-mono text-white">4 / 4</span>
