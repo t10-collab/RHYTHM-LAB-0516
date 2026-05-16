@@ -1,0 +1,8 @@
+{
+  "name": "Rhythm Lab (BPM 88)",
+  "description": "A musical playground to create and play 4/4 time signature rhythms with 8th and 16th note subdivisions.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
